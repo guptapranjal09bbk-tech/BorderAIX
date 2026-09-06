@@ -226,7 +226,7 @@ def security_gate():
 
     st.markdown("# 🛡️ BorderAI Secure Access")
     st.markdown("### Government / Authorized Operator Authentication")
-    st.caption("Protected entry • Per-ID failed-login monitoring • Per-ID 24-hour lockout • Tamper-evident audit")
+    st.caption("Protected entry • Per-ID failed-login monitoring • Per-ID 5-second lockout • Tamper-evident audit")
 
     with st.form("borderai_login", clear_on_submit=False):
         gov_id = st.text_input("Government ID / Authorized ID")
@@ -245,7 +245,7 @@ def security_gate():
                 until = datetime.fromisoformat(blocked_until)
                 if datetime.now() < until:
                     remaining = until - datetime.now()
-                    st.error("🔒 ACCESS BLOCKED — This ID is under a 24-hour security lock.")
+                    st.error("🔒 ACCESS BLOCKED — This ID is under a 5-second security lock.")
                     st.warning(
                         f"Blocked ID: {gov_id[:64]} | Until: {until.strftime('%d-%m-%Y %H:%M:%S')} | "
                         f"Remaining: {str(remaining).split('.')[0]}"
@@ -305,12 +305,12 @@ def security_gate():
                 alarm()
                 st.info("📱 SMS alert sent." if sent else f"📱 SMS not sent: {info}")
             else:
-                until = datetime.now() + timedelta(hours=24)
+                until = datetime.now() + timedelta(seconds=5)
                 record["blocked_until"] = until.isoformat(timespec="seconds")
                 save_security_record(gov_id_key, record)
                 sms = (
                     "Alert: BorderAI security activity detected. "
-                    "3 failed login attempts. This ID is blocked for 24 hours. "
+                    "3 failed login attempts. This ID is blocked for 5 seconds. "
                     f"ID: {gov_id[:64]}. "
                     "Risk: 100%. "
                     f"Time: {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}. "
@@ -318,7 +318,7 @@ def security_gate():
                     "Reply STATUS for updates. Test message from Twilio."
                 )
                 sent, info = send_security_sms(sms)
-                st.error("🔒 ACCESS BLOCKED FOR 24 HOURS — This ID only is locked.")
+                st.error("🔒 ACCESS BLOCKED FOR 5 SECONDS — This ID only is locked.")
                 alarm()
                 st.info("📱 SMS alert sent." if sent else f"📱 SMS not sent: {info}")
                 st.stop()
