@@ -5,7 +5,7 @@ import numpy as np
 from ultralytics import YOLO
 import tempfile, os, time, math, base64, io, wave
 from datetime import datetime, timedelta
-import hashlib, json, hmac
+import hashlib, json, hmac    
 
 try:
     from twilio.rest import Client
@@ -189,7 +189,8 @@ def security_gate():
     expected_hash = get_secret("BORDERAI_PASSWORD_HASH", DEFAULT_PASSWORD_HASH)
     record = current_security_record()
 
-    blocked_until = record.get("blocked_until")
+    record["blocked_until"] = None
+blocked_until = None
     if blocked_until:
         try:
             until = datetime.fromisoformat(blocked_until)
