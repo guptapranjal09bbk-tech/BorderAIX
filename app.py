@@ -195,7 +195,7 @@ def current_security_record(user_id=None):
     if blocked_until:
         try:
             until = datetime.fromisoformat(blocked_until)
-            if datetime.now()  until:
+            if datetime.now() > until:
                 return record
             record["blocked_until"] = None
             records[key] = record
