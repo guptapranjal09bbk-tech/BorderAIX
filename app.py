@@ -195,7 +195,7 @@ def security_gate():
             until = datetime.fromisoformat(blocked_until)
             if datetime.now() < until:
                 remaining = until - datetime.now()
-                st.error("🔒 ACCESS BLOCKED — 24-hour security lock is active.")
+                st.error("🔒 ACCESS BLOCKED — 5-second security lock is active.")
                 st.warning(f"Blocked until: {until.strftime('%d-%m-%Y %H:%M:%S')} | Remaining: {str(remaining).split('.')[0]}")
                 st.stop()
         except Exception:
@@ -206,7 +206,7 @@ def security_gate():
 
     st.markdown("# 🛡️ BorderAI Secure Access")
     st.markdown("### Government / Authorized Operator Authentication")
-    st.caption("Protected entry • Failed-login monitoring • 24-hour lockout • Tamper-evident audit")
+    st.caption("Protected entry • Failed-login monitoring • 5-second lockout • Tamper-evident audit")
 
     with st.form("borderai_login", clear_on_submit=False):
         gov_id = st.text_input("Government ID / Authorized ID")
@@ -250,20 +250,20 @@ def security_gate():
                 alarm()
                 st.info("📱 SMS alert sent." if sent else f"📱 SMS not sent: {info}")
             else:
-                until = datetime.now() + timedelta(hours=24)
+                until = datetime.now() + timedelta(second=5)
                 record["blocked_until"] = until.isoformat(timespec="seconds")
                 state = get_security_state()
                 state["login"] = record
                 save_json(SECURITY_STATE_FILE, state)
                 sms = (
                     "🔴 BorderAI SECURITY ALERT\n"
-                    "3 failed login attempts. Access blocked for 24 hours.\n"
+                    "3 failed login attempts. Access blocked for 5 seconds.\n"
                     "Risk: 100%\n"
                     f"Time: {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}\n"
                     f"Incident ID: {audit['id']}"
                 )
                 sent, info = send_security_sms(sms)
-                st.error("🔒 ACCESS BLOCKED FOR 24 HOURS — Third failed attempt recorded.")
+                st.error("🔒 ACCESS BLOCKED FOR 5 second — Third failed attempt recorded.")
                 alarm()
                 st.info("📱 SMS alert sent." if sent else f"📱 SMS not sent: {info}")
                 st.stop()
