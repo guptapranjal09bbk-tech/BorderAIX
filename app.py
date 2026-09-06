@@ -172,17 +172,20 @@ def current_security_record():
     state = get_security_state()
     record = state.get("login", {})
     blocked_until = record.get("blocked_until")
-    if blocked_until:
-        try:
-            if datetime.now() < datetime.fromisoformat(blocked_until):
-                return record
-            record["blocked_until"] = None
-            state["login"] = record
-            save_json(SECURITY_STATE_FILE, state)
-        except Exception:
-            record["blocked_until"] = None
-    return record
 
+if blocked_until:
+    try:
+        until = datetime.fromisoformat(blocked_until)
+        if datetime.now() < until:
+            remaining = until - datetime.now()
+            st.error("🔒 ACCESS BLOCKED — 5-second security lock is active.")
+            st.warning(
+                f"Blocked until: {until.strftime('%d-%m-%Y %H:%M:%S')} | "
+                f"Remaining: {str(remaining).split('.')[0]}"
+            )
+            st.stop()
+    except Exception:
+        pass
 
 def security_gate():
     expected_id = get_secret("BORDERAI_GOV_ID", DEFAULT_GOV_ID)
@@ -251,7 +254,7 @@ blocked_until = None
                 alarm()
                 st.info("📱 SMS alert sent." if sent else f"📱 SMS not sent: {info}")
             else:
-                until = datetime.now() + timedelta(second=5)
+                until = datetime.now() + timedelta(seconds=5)
                 record["blocked_until"] = until.isoformat(timespec="seconds")
                 state = get_security_state()
                 state["login"] = record
