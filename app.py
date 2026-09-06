@@ -178,7 +178,7 @@ def send_security_sms(message_text):
         return False, "Twilio secrets are not configured."
     try:
         client = Client(sid, token)
-        msg = client.messages.create(body=message_text, from_=from_number, to=to_number)
+        msg = client.messages.create(sms_account_alerts, from_=from_number, to=to_number)
         return True, str(msg.sid)
     except Exception as exc:
         return False, str(exc)
